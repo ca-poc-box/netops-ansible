@@ -1,0 +1,6 @@
+---
+- hosts: uim
+  become: yes
+  roles:
+    - uim
+

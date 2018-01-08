@@ -1,0 +1,31 @@
+# CAPC installer properties
+
+#Choose Install Folder
+#---------------------
+USER_INSTALL_DIR=/opt/CA
+
+#Set the maximum memory allocation for CA Performance Center services.
+#---------------------------------------------------------------------
+MEM_ALLOC_CONSOLE_INPUTS=\"2679\",\"2679\",\"4019\"
+
+#Configure CA Application Performance Management
+#-----------------------------------------------
+CHOSEN_APM_CONFIG=0
+
+#Select a Location for the MySQL Data Directory
+#----------------------------------------------
+MYSQL_DATA_FOLDER=<null>
+
+#Select a Location for the MySQL Temp Directory
+#----------------------------------------------
+MYSQL_TEMP_FOLDER=<null>
+
+#Install
+#-------
+-fileOverwrite_/tmp/da-rib-docs.jar=Yes
+-fileOverwrite_{{ installation_path }}/uninstall/Uninstall_PerformanceCenter.lax=Yes
+-fileOverwrite_{{ installation_path }}/CA_Remote_Engineer_Unix.tar.gz=Yes
+-fileOverwrite_{{ installation_path }}/CAPC.txt=Yes
+-fileOverwrite_{{ installation_path }}/installCARE.sh=Yes
+-fileOverwrite_{{ installation_path }}/NOTICE.txt=Yes
+-fileOverwrite_{{ installation_path }}/CAPC_SeedFile.xml=Yes

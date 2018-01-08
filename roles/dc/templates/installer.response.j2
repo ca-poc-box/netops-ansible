@@ -1,0 +1,50 @@
+# Data Collector installer properties
+
+#Enter User Name
+#---------------
+DCM_USER=root
+
+#Choose Install Folder
+#---------------------
+USER_INSTALL_DIR={{ installation_path }}
+
+#Configure Maximum Process Memory
+#--------------------------------
+IM_MAX_MEM=5298M
+
+#Data Aggregator Host/IP Address
+#-------------------------------
+DM_HOST={{ groups['da'][0] }}
+
+#Configure CA Application Performance Management
+#-----------------------------------------------
+CHOSEN_APM_CONFIG=0
+
+{% if deployment_type is defined and deployment_type == 'fault_tolerant' %}
+#Configure Data Collector For Data Aggregator Fault Tolerance
+#------------------------------------------------------------
+CHOSEN_DA_HA_CONFIG=1
+
+#Inactive Data Aggregator Host/IP Address
+#----------------------------------------
+DM_STANDBY_HOST_1={{ groups['da'][1] }}
+{% endif %}
+
+#Install
+#-------
+-fileOverwrite_{{ installation_path }}/Uninstall/Uninstall.lax=Yes
+-fileOverwrite_{{ installation_path }}/Uninstall/inst_dcmd=Yes
+-fileOverwrite_{{ installation_path }}/ICMPD/icmpd=Yes
+-fileOverwrite_{{ installation_path }}/ICMPD/IcmpDaemon=Yes
+-fileOverwrite_{{ installation_path }}/apache-karaf.zip=Yes
+-fileOverwrite_{{ installation_path }}/activemq-bin-bin.tar.gz=Yes
+-fileOverwrite_{{ installation_path }}/activemq.xml=Yes
+-fileOverwrite_{{ installation_path }}/CA_Remote_Engineer_Unix.tar.gz=Yes
+-fileOverwrite_{{ installation_path }}/IMDataCollector.txt=Yes
+-fileOverwrite_{{ installation_path }}/installCARE.sh=Yes
+-fileOverwrite_{{ installation_path }}/maven_repository.zip=Yes
+-fileOverwrite_{{ installation_path }}/NOTICE.txt=Yes
+-fileOverwrite_{{ installation_path }}/.dc_version.properties=Yes
+#-fileOverwrite_/opt/DCM.cfg=Yes
+#-fileOverwrite_/opt/dcmd=Yes
+#-fileOverwrite_/opt/activemq.sh=Yes

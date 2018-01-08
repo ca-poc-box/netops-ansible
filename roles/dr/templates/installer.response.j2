@@ -1,0 +1,19 @@
+# Data Recorder installer properties
+
+#Host Evaluation Error
+#---------------------
+PROMPT_USER_CHOSEN_OPTION=0
+
+#Choose Install Folder
+#---------------------
+USER_INSTALL_DIR={{ installation_path }}
+
+#Install
+#-------
+-fileOverwrite_{{ installation_path }}/Uninstall/Uninstall.lax=Yes
+-fileOverwrite_{{ installation_path }}/drinstall.properties=Yes
+-fileOverwrite_{{ installation_path }}/resources/vertica-8.1.0-4.x86_64.RHEL6.rpm=Yes
+-fileOverwrite_{{ installation_path }}/resources/vlicense.dat=Yes
+-fileOverwrite_{{ installation_path }}/CA_Remote_Engineer_Unix.tar.gz=Yes
+-fileOverwrite_{{ installation_path }}/IMDataRepository.txt=Yes
+-fileOverwrite_{{ installation_path }}/installCARE.sh=Yes

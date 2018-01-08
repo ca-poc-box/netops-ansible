@@ -1,0 +1,21 @@
+---
+- fail:
+    msg: "Inventory file must contain exactly 2 DAs for fault-tolerant deployemnts"
+  when: "'da' not in groups or groups['da'] | length != 2"
+  run_once: yes
+
+- fail:
+    msg: "Inventory file must contain exactly 1 DAProxy for fault-tolerant deployments"
+  when: "'daproxy' not in groups or groups['daproxy'] | length != 1"
+  run_once: yes
+
+- fail:
+    msg: "Inventory file must contain at least 1 DR for fault-tolerant deployments"
+  when: "'dr' not in groups or groups['dr'] | length < 1"
+  run_once: yes
+
+- fail:
+    msg: "Inventory file must contain exactly 1 CAPC for fault-tolerant deployments"
+  when: "'capc' not in groups or groups['capc'] | length != 1"
+  run_once: yes
+

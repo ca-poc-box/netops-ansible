@@ -1,0 +1,14 @@
+---
+- name: Copy installer zip file
+  win_copy:
+   src: '{{ cabi_installer_path }}'
+   dest: c:\installers\cabi\
+- name: Unzip CABI installer
+  win_unzip:
+   src: c:\installers\cabi\CABI.zip
+   dest: c:\installers\cabi\bits
+   creates: c:\installers\cabi\bits
+- name: Copy installer response file
+  template:
+   src: CABusinessIntelligence.properties
+   dest: c:\installers\cabi\bits\CABusinessIntelligence.properties

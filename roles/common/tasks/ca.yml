@@ -1,0 +1,58 @@
+---
+- name: 'Install prerequisites (eg. yum-utils, epel)'
+  package:
+    name: '{{ item }}'
+    state: installed
+  with_items:
+    - rpcbind
+    - nfs-utils
+
+- name: Start services
+  service:
+    name: rpcbind
+    state: started
+    enabled: yes
+
+- name: Check if autofs service is running
+  command: service autofs status
+  ignore_errors: yes
+  register: autofs_status
+
+- name: Stop autofs service (it locks /home preventing us from creating user home directories later)
+  service:
+    name: autofs
+    state: stopped
+    enabled: no
+  when: autofs_status.rc == 0
+
+- name: Mount galaxy and gravity shares
+  mount:
+    src: '{{ item.src }}'
+    name: '{{ item.name }}'
+    state: mounted
+    fstype: nfs
+    opts: ro,soft,intr,bg,_netdev
+  with_items:
+    - { src: 'galaxy:/builds_framingham', name: '/net/galaxy/builds_framingham' }
+    - { src: 'gravity:/builds_framingham', name: '/net/gravity/builds_framingham' }
+    - { src: 'gravity:/builds_sunshine', name: '/net/gravity/builds_sunshine' }
+    - { src: 'gravity:/RedHat', name: '/net/gravity/RedHat' }
+
+- name: Add the RedHat CDROM as a yum repo (RHEL only)
+  template:
+    src: cd.repo.j2
+    dest: /etc/yum.repos.d/cd.repo
+    force: no
+  when: ansible_distribution == "RedHat"
+
+- name: Load /etc/hosts template file
+  set_fact:
+    etc_hosts_template: "{{ lookup( 'template', 'templates/etc-hosts.j2' ) }}"
+
+- name: Update /etc/hosts
+  blockinfile:
+    dest: /etc/hosts
+    block: "{{ etc_hosts_template }}"
+    state: present
+    backup: yes
+

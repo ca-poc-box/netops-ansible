@@ -1,0 +1,6 @@
+---
+- hosts: apm
+  become: yes
+  roles:
+    - apm
+

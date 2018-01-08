@@ -1,0 +1,17 @@
+---
+- name: save iptables
+  shell: iptables-save > /etc/sysconfig/iptables
+
+- name: reload iptables
+  service:
+    name: iptables
+    state: reloaded
+
+- name: restart iptables
+  service:
+    name: iptables
+    state: restarted
+
+- name: reload firewalld
+  command: firewall-cmd --reload
+

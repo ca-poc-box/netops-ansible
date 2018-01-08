@@ -1,0 +1,51 @@
+# NTP Settings
+ntp_servers:
+#  - <your NTP server goes here>
+
+# APM
+apm_installer_path: '{{ inventory_dir }}/installers/apm/installIntroscope.bin
+apm_installer_remote_src: no 
+
+# CAPC
+capc_installer_path: '{{ inventory_dir }}/installers/pc/CAPerfCenterSetup.bin'
+capc_installer_remote_src: no
+
+# DA
+da_installer_path: '{{ inventory_dir }}/installers/da/installDA.bin'
+da_installer_remote_src: no
+
+# DR
+dr_installer_path: '{{ inventory_dir }}/installers/dr/installDR.bin'
+dr_installer_remote_src: no
+
+# DAProxy
+daproxy_installer_path: '{{ inventory_dir }}/installers/capm/installDAProxy.bin'
+daproxy_installer_remote_src: no
+
+# Consul
+consul_installer_path: '{{ inventory_dir }}/installers/capm/installConsul.bin'
+consul_installer_remote_src: no
+
+# Consul Extension
+consulext_installer_path: '{{ inventory_dir }}/installers/capm/installConsulExt.bin'
+consulext_installer_remote_src: no
+
+# VNA
+vna_installer_path: '{{ inventory_dir }}/installers/capm/installVNA.txe'
+vna_installer_remote_src: no
+
+#SPECTRUM-MAJOR
+ssmajor_installer_path: '{{ inventory_dir }}/installers/spectrum/SPECTRUM-MAJOR.tar.gz'
+ssmajor_installer_remote_src: no
+
+#SPECTRUM-MINOR
+ssminor_installer_path: '{{ inventory_dir }}/installers/spectrum/SPECTRUM-MINOR.txe'
+ssminor_installer_remote_src: no
+
+#SDC
+sdc_installer_path: '{{ inventory_dir }}/installers/spectrum/sdmc/linux/install.bin'
+sdc_installer_remote_src: no
+
+#CABI
+cabi_installer_path: '{{ inventory_dir }}/installers/cabi/CABI.zip'
+sdc_installer_remote_src: no

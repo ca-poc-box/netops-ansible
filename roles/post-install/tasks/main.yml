@@ -1,0 +1,36 @@
+---
+- name: Wait until DA REST is accessible from CAPC
+  uri:
+    url: http://{{ item }}:8581
+    method: GET
+    status_code: 200
+    timeout: 10
+  retries: 5
+  with_items: "{{ groups['daproxy'] if deployment_type is defined and deployment_type == 'fault_tolerant' else groups['da'][0] }}"
+  when: inventory_hostname in groups['capc']
+
+- name: Get the list of existing data sources from CAPC
+  uri:
+    url: http://localhost:8181/pc/center/webservice/datasources
+    method: GET
+    return_content: yes
+    user: admin
+    password: admin
+    force_basic_auth: yes
+    timeout: 10
+  retries: 5
+  when: inventory_hostname in groups['capc']
+  register: datasource_list
+
+- name: Register the DA as a datasource in CAPC
+  uri:
+    url: http://localhost:8181/pc/center/webservice/datasources
+    method: POST
+    user: admin
+    password: admin
+    force_basic_auth: yes
+    body: "{{ lookup('template', 'datasource-registration.j2') | replace('\n', '') }}"
+    headers:
+      Content-Type: "application/xml"
+  when: inventory_hostname in groups['capc'] and not datasource_list.content | search("<name>Data Aggregator.*</name>")
+

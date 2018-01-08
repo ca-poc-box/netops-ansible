@@ -1,0 +1,6 @@
+---
+- hosts: dc-saas
+  become: yes
+  roles:
+    - dc-saas
+

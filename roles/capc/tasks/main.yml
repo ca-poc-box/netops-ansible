@@ -1,0 +1,40 @@
+---
+- include_role:
+    name: firewall
+    private: yes
+  vars:
+    firewall_port_list:
+      - { destination_port: 3306, protocol: tcp }
+      - { destination_port: 8181, protocol: tcp }
+      - { destination_port: 8281, protocol: tcp }
+      - { destination_port: 8381, protocol: tcp }
+      - { destination_port: 8481, protocol: tcp }
+
+- name: Check for existing CAPC install
+  stat:
+    path: '{{ installation_path }}'
+  register: capc_stat
+
+- name: Copy hosts file
+  template:
+    src: hosts.file.j2
+    dest: /etc/hosts
+
+- name: Copy installer properties
+  template:
+    src: installer.response.j2
+    dest: /capc.response
+  when: not capc_stat.stat.exists
+
+- name: Copy CAPC installer
+  copy:
+    src: '{{ capc_installer_path }}'
+    dest: /CAPerfCenterSetup.bin
+    mode: 0700
+    remote_src: '{{ capc_installer_remote_src }}'
+  when: not capc_stat.stat.exists
+
+- name: Install CAPC
+  command: /CAPerfCenterSetup.bin -i silent -f /capc.response
+  when: not capc_stat.stat.exists
+

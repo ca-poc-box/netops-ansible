@@ -1,0 +1,32 @@
+# DA Proxy installer properties
+
+#Choose Install Set
+#------------------
+CHOSEN_FEATURE_LIST=DAProxy,Help,Consul
+CHOSEN_INSTALL_FEATURE_LIST=DAProxy,Help,Consul
+CHOSEN_INSTALL_SET=Typical
+
+#Choose Install Folder
+#---------------------
+USER_INSTALL_DIR={{ installation_path }}
+
+#First DA Host
+#-------------
+DA1_HOST={{ groups['da'][0] }}
+
+#Second DA Host
+#--------------
+DA2_HOST={{ groups['da'][1] }}
+
+#DA HTTP API port
+#----------------
+DA_HTTP_API_PORT=8581
+
+#Consul port
+#-----------
+CONSUL_PORT=8500
+
+#Consul bind address
+#-----------
+CONSUL_BIND_ADDR={{ ansible_default_ipv4.address }}
+

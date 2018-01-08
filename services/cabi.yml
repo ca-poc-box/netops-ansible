@@ -1,0 +1,6 @@
+---
+- hosts: cabi
+  become_method: run_as
+  roles:
+    - cabi
+

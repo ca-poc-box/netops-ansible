@@ -1,0 +1,25 @@
+{% if 'capc' in groups and groups['capc'] | length > 0 %}
+{% for capc in groups['capc'] %}
+{{ hostvars[capc].ansible_default_ipv4.address }} capm-pc{{ loop.index }} capm-pc{{ loop.index }}.ca.com
+{% endfor %}
+{% endif %}
+
+{% if 'daproxy' in groups and groups['daproxy'] | length > 0 %}
+{% for daproxy in groups['daproxy'] %}
+{{ hostvars[daproxy].ansible_default_ipv4.address }} capm-daproxy{{ loop.index }} capm-daproxy{{ loop.index }}.ca.com
+{% endfor %}
+{% endif %}
+
+{% for da in groups['da'] %}
+{{ hostvars[da].ansible_default_ipv4.address }} capm-da{{ loop.index }} capm-da{{ loop.index }}.ca.com
+{% endfor %}
+
+{% for dr in groups['dr'] %}
+{{ hostvars[dr].ansible_default_ipv4.address }} capm-dr{{ loop.index }} capm-dr{{ loop.index }}.ca.com
+{% endfor %}
+
+{% if 'vna' in groups and groups['vna'] | length > 0 %}
+{% for vna in groups['vna'] %}
+{{ hostvars[vna].ansible_default_ipv4.address }} capm-vna{{ loop.index }} capm-vna{{ loop.index }}.ca.com
+{% endfor %}
+{% endif %}

@@ -1,0 +1,40 @@
+---
+- name: Include OS-specific variables
+  include_vars: "{{ include_file }}"
+  with_first_found:
+    - files:
+        - "defaults/{{ ansible_os_family }}_{{ ansible_distribution_major_version }}.yml"
+      skip: yes
+  loop_control:
+    loop_var: include_file
+
+- name: 'Install prerequisites (eg. yum-utils, epel)'
+  package:
+    name: '{{ item }}'
+    state: installed
+  with_items:
+    - yum-utils
+    - libselinux-python
+    - unzip
+
+- name: Include distro-specific tasks
+  include: '{{ include_file }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_distribution }}.yml'
+      skip: yes
+  loop_control:
+    loop_var: include_file
+
+- name: Enable IPv4 forwarding
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: 1
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: Include tasks for CA-internal deployments
+  include: ca.yml
+  when: site is defined and site.lower() == 'ca'
+

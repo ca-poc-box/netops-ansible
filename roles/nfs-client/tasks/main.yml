@@ -1,0 +1,16 @@
+---
+- name: Install NFS packages
+  package:
+    name: '{{ item }}'
+    state: installed
+  with_items:
+    - nfs-utils
+
+- name: Mount the shared drive
+  mount:
+    src: "{{ groups['daproxy'][0] }}:/nfsshare"
+    name: /nfsshare
+    state: mounted
+    fstype: nfs4
+    opts: rw,soft,intr,bg,_netdev
+

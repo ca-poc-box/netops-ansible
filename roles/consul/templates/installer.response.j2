@@ -1,0 +1,13 @@
+# Consul Server installer properties
+
+#Choose Install Folder
+#---------------------
+USER_INSTALL_DIR={{ installation_path }}
+
+#Consul Port
+#-----------
+CONSUL_PORT=8500
+
+CONSUL_BIND_ADDR={{ ansible_default_ipv4.address }}
+
+DA_PROXY_HOST={{ groups['daproxy'][0] }}

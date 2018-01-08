@@ -1,0 +1,47 @@
+# Include CA-specific deployment steps
+site: ca
+
+# NTP Settings
+ntp_servers:
+  - uspmdc04.ca.com
+
+# Installer paths
+installer_base_dir: /net/gravity/builds_framingham
+spectrum_installer_base_dir: /net/gravity/builds_sunshine/cm/Linux/10.03.00.00.129/vcd
+
+# CAPC
+capc_installer_path: '{{ installer_base_dir }}/PC_Main_Release/latest/CAPerfCenterSetup.bin'
+capc_installer_remote_src: yes
+
+# DA
+da_installer_path: '{{ installer_base_dir }}/DA_Main_Release/latest/installDA.bin'
+da_installer_remote_src: yes
+
+# DR
+dr_installer_path: '{{ installer_base_dir }}/DA_Main_Release/latest/installDR.bin'
+dr_installer_remote_src: yes
+
+# DAProxy
+daproxy_installer_path: '{{ installer_base_dir }}/CE_Main_Release/latest/installDAProxy.bin'
+daproxy_installer_remote_src: yes
+
+# Consul
+consul_installer_path: '{{ installer_base_dir }}/CE_Main_Release/latest/installConsul.bin'
+consul_installer_remote_src: yes
+
+# Consul Extension
+consulext_installer_path: '{{ installer_base_dir }}/CE_Main_Release/latest/installConsulExt.bin'
+consulext_installer_remote_src: yes
+
+# VNA
+vna_installer_path: '{{ installer_base_dir }}/SDN_Dev/latest/CA_VNA-SDN_dev-Linux.txe'
+vna_installer_remote_src: yes
+
+#SRAdmin
+srad_installer_path: '{{ spectrum_installer_base_dir }}/sdic/linux/srainstall.bin'
+
+#SDC
+sdc_installer_path: '{{ spectrum_installer_base_dir }}/sdmc/linux/install.bin'
+
+#SS/OC
+distinst_installer_path: '{{ spectrum_installer_base_dir }}/sdic/sdiclinux.exe'

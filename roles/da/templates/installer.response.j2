@@ -1,0 +1,104 @@
+# Data Aggregator Installer Properties
+
+#Enter User Name
+#---------------
+DM_USER=root
+
+#Choose Install Folder
+#---------------------
+USER_INSTALL_DIR={{ installation_path }}
+
+#Configure Maximum Data Aggregator Process Memory
+#------------------------------------------------
+IM_MAX_MEM=4800M
+
+#Configure Maximum ActiveMQ Process Memory
+#-----------------------------------------
+AMQ_MAX_MEM=1600M
+
+#Data Repository Information (1/4) - Data Repository Server Hostname/IP
+#----------------------------------------------------------------------
+DB_SERVER_HOSTNAME={{ groups['dr'] | join(',') }}
+
+#Data Repository Information (1/4) - Data Repository Server Port
+#---------------------------------------------------------------
+DB_SERVER_PORT=5433
+
+#Data Repository Information (1/4) - Data Repository Database Name
+#-----------------------------------------------------------------
+DB_INSTANCE_NAME=drdata
+
+#Data Repository Information (2/4) - Database Schema
+#---------------------------------------------------
+CREATE_SCHEMA_YES=1
+
+#Data Repository Information (3/4) - Data Repository Username
+#------------------------------------------------------------
+DB_USER_NAME=dauser
+
+#Data Repository Information (3/4) - Data Repository User Password
+#Password: dapass
+#-----------------------------------------------------------------
+DB_USER_PASSWORD=695D4B4A64555449
+
+#Data Repository Information (4/4) - Data Repository Admin Username
+#------------------------------------------------------------------
+DB_ADMIN_USER_NAME=dradmin
+
+#User Input Error
+#----------------
+PROMPT_USER_CHOSEN_OPTION=0
+
+#Data Repository Information (4/4) - Data Repository Admin User Password
+#Password: drpass
+#-----------------------------------------------------------------------
+DB_ADMIN_USER_PASSWORD=695D4B4A64595B49
+
+#HTTP Port
+#---------
+HTTP_PORT=8581
+
+#SSH Port
+#--------
+KARAF_SSH_PORT=8501
+
+#Configure CA Application Performance Management
+#-----------------------------------------------
+CHOSEN_APM_CONFIG=0
+
+{% if deployment_type is defined and deployment_type == 'fault_tolerant' %}
+DA_DATA_HOME=/nfsshare
+
+#Whether or not to install fault tolerant DA
+#-------------------------------------------
+CHOSEN_HA_DIALOG_BUTTON=1
+
+#Start the DA after installation
+#-------------------------------
+CHOSEN_START_DA_DIALOG_BUTTON=1
+
+#DAProxy Host
+#------------
+DA_PROXY_HOST_INPUT_1={{ groups['daproxy'][0] }}
+
+#Consul Server port
+#------------------
+CONSUL_PORT_INPUT_1=8500
+{% endif %}
+
+#Install
+#-------
+-fileOverwrite_{{ installation_path }}/Uninstall/Uninstall.lax=Yes
+-fileOverwrite_{{ installation_path }}/apache-karaf.tar.gz=Yes
+-fileOverwrite_{{ installation_path }}/certifications.zip=Yes
+-fileOverwrite_{{ installation_path }}/activemq-bin-bin.tar.gz=Yes
+-fileOverwrite_{{ installation_path }}/activemq.xml=Yes
+-fileOverwrite_{{ installation_path }}/CA_Remote_Engineer_Unix.tar.gz=Yes
+-fileOverwrite_{{ installation_path }}/IMDataAggregator.txt=Yes
+-fileOverwrite_{{ installation_path }}/installCARE.sh=Yes
+-fileOverwrite_{{ installation_path }}/IMDataCollector/ICMPD/icmpd=Yes
+-fileOverwrite_{{ installation_path }}/IMDataCollector/ICMPD/IcmpDaemon=Yes
+-fileOverwrite_{{ installation_path }}/IMDataCollector/installDC=Yes
+-fileOverwrite_{{ installation_path }}/NOTICE.txt=Yes
+-fileOverwrite_{{ installation_path }}/karafd.sh=Yes
+-fileOverwrite_{{ installation_path }}/activemq.sh=Yes

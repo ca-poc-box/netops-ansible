@@ -1,0 +1,36 @@
+---
+- include_role:
+    name: firewall
+    private: yes
+  vars:
+    firewall_port_list:
+      - { destination_port: 8300, protocol: tcp }
+      - { destination_port: 8301, protocol: tcp }
+      - { destination_port: 8302, protocol: tcp }
+      - { destination_port: 8500, protocol: tcp }
+      - { destination_port: 8500, protocol: udp }
+      - { destination_port: 8581, protocol: tcp }
+
+- name: Check for existing DAProxy install
+  stat:
+    path: '{{ installation_path }}'
+  register: daproxy_stat
+
+- name: Copy installer properties
+  template:
+    src: installer.response.j2
+    dest: /daproxy.response
+  when: not daproxy_stat.stat.exists
+
+- name: Copy DAProxy installer
+  copy:
+    src: '{{ daproxy_installer_path }}'
+    dest: /installDAProxy.bin
+    mode: 0700
+    remote_src: '{{ daproxy_installer_remote_src }}'
+  when: not daproxy_stat.stat.exists
+
+- name: Install DAProxy
+  command: /installDAProxy.bin -i silent -f /daproxy.response
+  when: not daproxy_stat.stat.exists
+

@@ -1,0 +1,9 @@
+---
+- hosts: da
+  become: yes
+  roles:
+    - name: nfs-client
+      when: deployment_type == 'fault_tolerant'
+
+    - name: da
+

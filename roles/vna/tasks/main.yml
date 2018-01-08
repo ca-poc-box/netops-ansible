@@ -1,0 +1,42 @@
+---
+- include_role:
+    name: firewall
+    private: yes
+  vars:
+    firewall_port_list:
+      - { destination_port: 8080, protocol: tcp }
+      - { destination_port: 8787, protocol: tcp }
+      - { destination_port: 9990, protocol: tcp }
+
+- name: Install packages
+  package:
+    name: '{{ item }}'
+    state: installed
+  with_items:
+    - java-1.8.0-openjdk
+    - which
+    - curl
+    - libaio
+
+- name: Check for existing VNA install
+  stat:
+    path: '{{ installation_path }}'
+  register: vna_stat
+
+- name: Check for existing VNA installer
+  stat:
+    path: /installVNA.bin
+  register: installer_stat
+
+- name: Copy VNA installer
+  copy:
+    src: '{{ vna_installer_path }}'
+    dest: /installVNA.bin
+    mode: 0700
+    remote_src: '{{ vna_installer_remote_src }}'
+  when: not vna_stat.stat.exists and not installer_stat.stat.exists
+
+- name: Install VNA
+  command: /installVNA.bin --no-prompt --accept-eula
+  when: not vna_stat.stat.exists
+

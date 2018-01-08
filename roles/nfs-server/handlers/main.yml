@@ -1,0 +1,10 @@
+---
+- name: restart nfs
+  service:
+    name: nfs
+    state: restarted
+    enabled: true
+
+- name: reload firewalld
+  command: firewall-cmd --reload
+

@@ -1,0 +1,18 @@
+---
+- name: Check if iptables service is running
+  command: service iptables status
+  ignore_errors: yes
+  register: iptables_status
+
+- name: Update iptables (if iptables is running)
+  iptables:
+    chain: INPUT
+    destination_port: '{{ item.destination_port }}'
+    protocol: '{{ item.protocol }}'
+    jump: ACCEPT
+    action: insert
+  with_items: '{{ firewall_port_list }}'
+  when: iptables_status.rc == 0
+  notify:
+    - save iptables
+

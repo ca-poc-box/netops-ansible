@@ -1,0 +1,46 @@
+---
+- include_vars: firewall.yml
+
+- include_role:
+    name: firewall
+    private: yes
+
+- name: Check for existing APM install
+  stat:
+    path: '{{ installation_path }}'
+  register: apm_stat
+
+- name: Copy hosts file
+  template:
+    src: hosts.file.j2
+    dest: /etc/hosts
+
+- name: Copy installer properties
+  template:
+    src: installer.response.j2
+    dest: /apm.installer.properties
+  when: not apm_stat.stat.exists
+
+- name: Copy EULA file
+  template:
+    src: ca-eula.txt.j2
+    dest: /ca-eula.txt
+  when: not apm_stat.stat.exists  
+
+- name: Copy APM installer
+  copy:
+    src: '{{ apm_installer_path }}'
+    dest: /installIntroscope.bin
+    mode: 0700
+    remote_src: '{{ apm_installer_remote_src }}'
+  when: not apm_stat.stat.exists
+
+- name: Install DA
+  command: /installIntroscope.bin -i silent -f /apm.installer.properties
+  when: not apm_stat.stat.exists
+  register: apm_install_status
+
+- name: Set fact to indicate whether or not the APM install was performed
+  set_fact:
+    apm_install_performed:
+      "{ '{{ ansible_hostname }}': {{ apm_install_status.changed }} }"

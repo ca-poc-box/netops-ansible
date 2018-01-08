@@ -1,0 +1,6 @@
+---
+- hosts: capc
+  become: yes
+  roles:
+    - capc
+

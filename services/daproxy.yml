@@ -1,0 +1,9 @@
+---
+- hosts: daproxy
+  become: yes
+  roles:
+    - name: nfs-server
+      when: deployment_type == 'fault_tolerant'
+
+    - name: daproxy
+

@@ -1,0 +1,3 @@
+---
+- name: Set the deployment_type
+  set_fact: deployment_type={{ 'fault_tolerant' if groups['da'] | length > 1 else 'standard' }}

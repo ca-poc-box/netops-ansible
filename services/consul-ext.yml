@@ -1,0 +1,6 @@
+---
+- hosts: da
+  become: yes
+  roles:
+    - consul-ext
+

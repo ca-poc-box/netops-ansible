@@ -1,0 +1,6 @@
+---
+- hosts: uim-tunnel
+  become: yes
+  roles:
+    - uim-tunnel
+

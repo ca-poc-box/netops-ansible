@@ -1,0 +1,31 @@
+---
+- include_role:
+    name: firewall
+    private: yes
+  vars:
+    firewall_port_list:
+      - { destination_port: 6844, protocol: tcp }
+      - { destination_port: 162, protocol: udp }
+
+- name: Check for existing SDC install
+  stat:
+    path: '{{ installation_path }}'
+  register: sdc_stat
+
+- name: Copy installer properties
+  template:
+    src: installer.response.j2
+    dest: /sdc.installer.properties
+  when: not sdc_stat.stat.exists
+
+- name: Install SDC
+  command: '{{ sdc_installer_path }} -i silent -f /sdc.installer.properties'
+  when: not sdc_stat.stat.exists
+
+- name: Configure connection to SpectroSERVER
+  shell: echo "-connect {{ groups['ss'][0] }}" > {{ installation_path }}/bin/sdc.config
+  when: not sdc_stat.stat.exists
+
+- name: Restart the SDC
+  shell: /etc/init.d/sdmconnector restart
+  when: not sdc_stat.stat.exists

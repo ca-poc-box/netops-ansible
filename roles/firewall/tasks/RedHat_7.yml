@@ -1,0 +1,17 @@
+---
+- name: Is firewalld running?
+  command: systemctl is-active firewalld
+  register: firewall_status
+  ignore_errors: yes
+
+- name: Update firewalld
+  firewalld:
+    port: '{{ item.destination_port }}/{{ item.protocol }}'
+    permanent: yes
+    state: enabled
+  with_items: '{{ firewall_port_list }}'
+
+- name: Reload firewalld
+  command: firewall-cmd --reload
+  when: firewall_status.rc == 0
+

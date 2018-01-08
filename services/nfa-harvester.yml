@@ -1,0 +1,6 @@
+---
+- hosts: nfa-harvester
+  become: yes
+  roles:
+    - nfa-harvester
+

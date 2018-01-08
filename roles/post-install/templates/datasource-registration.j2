@@ -1,0 +1,11 @@
+<dataSourceInfo>
+  <type>DATA_AGGREGATOR</type>
+  <enabled>true</enabled>
+  <name>Data Aggregator@{{ groups['daproxy'][0][:34] if deployment_type == 'fault_tolerant' else groups['da'][0][:34] }}</name>
+  <serviceAddress>
+    <protocol>http</protocol>
+    <host>{{ groups['daproxy'][0] if deployment_type == 'fault_tolerant' else groups['da'][0] }}</host>
+    <port>8581</port>
+  </serviceAddress>
+  <consoleSameAsDataSource>true</consoleSameAsDataSource>
+</dataSourceInfo>

@@ -1,0 +1,6 @@
+---
+- hosts: oc
+  become: yes
+  roles:
+    - oc
+

@@ -1,0 +1,13 @@
+firewall_port_list:
+  - { destination_port: 1099, protocol: tcp }
+  - { destination_port: 5005, protocol: tcp }
+  - { destination_port: 8161, protocol: tcp }
+  - { destination_port: 8300, protocol: tcp }
+  - { destination_port: 8301, protocol: tcp }
+  - { destination_port: 8302, protocol: tcp }
+  - { destination_port: 8500, protocol: tcp }
+  - { destination_port: 8500, protocol: udp }
+  - { destination_port: 8501, protocol: tcp }
+  - { destination_port: 8581, protocol: tcp }
+  - { destination_port: 11099, protocol: tcp }
+  - { destination_port: 61616, protocol: tcp }

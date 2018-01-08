@@ -1,0 +1,65 @@
+---
+- name: Enable firewalld
+  service: name=firewalld state=started enabled=yes
+
+- name: Setup snmp forwarding
+  command: firewall-cmd --permanent --direct --add-rule ipv4 mangle OUTPUT 0 -p udp --dport 161 -j MARK --set-mark 2
+
+- name: Setup icmp forwarding
+  command: firewall-cmd --permanent --direct --add-rule ipv4 mangle OUTPUT 1 -p icmp --icmp-type echo-request ! -d 192.168.10.0/24 -j MARK --set-mark 2
+
+- name: Setup NAT
+  command: firewall-cmd --permanent --direct --add-rule ipv4 nat POSTROUTING 0 -o tap0 -j MASQUERADE
+
+- name: Only allow SSH connections from the OA environment
+    block:
+      - command: firewall-cmd --permanent --zone=trusted --add-source=192.168.10.0/24
+      - command: firewall-cmd --permanent --zone=trusted --add-service=ssh
+      - command: firewall-cmd --permanent --zone=public --remove-service=ssh
+      - command: firewall-cmd --reload
+
+- name: Setup reverse packet filtering
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: net.ipv4.conf.tap0.rp_filter=2
+
+- name: Setup IP forwarding
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: net.ipv4.ip_forward=1
+
+- name: Reload sysctl
+  command: /sbin/sysctl -p /etc/sysctl.conf
+
+- name: Setup rt_tables
+  lineinfile:
+    path: /etc/iproute2/rt_tables
+    line: '5     netops'
+
+- name: Copy route script
+  copy:
+    src: vpn-up.sh
+    dst: /etc/openvpn/vpn-up.sh
+    mode: 0700
+
+- name: Setup openvpn to call route script
+  lineinfile:
+    path: /etc/openvpn/client.conf
+    insertbefore: '^<ca>'
+    line: 'script-security 2'
+
+- name: Setup openvpn to call route script
+  lineinfile:
+    path: /etc/openvpn/client.conf
+    insertbefore: '^<ca>'
+    line: 'up /etc/openvpn/vpn-up.sh'
+
+- name: Restart OpenVPN
+  service:
+    name: openvpn@client
+    state: restarted
+  
+- include_role:
+    name: dc
+    private: yes
+

@@ -1,0 +1,11 @@
+---
+- name: List supported OS's
+  debug: "msg='Supported operating systems: {{ supported_os_list }}'"
+  run_once: yes
+  delegate_to: localhost
+
+- name: Fail if target host is not running a supported OS
+  fail: "msg='Target host {{ ansible_hostname }} is not running a supported OS: {{ ansible_distribution }} {{ ansible_distribution_version }}'"
+  when: ansible_distribution + '_' + ansible_distribution_major_version not in supported_os_list
+
+- include: '{{ deployment_type }}.yml'

@@ -1,0 +1,6 @@
+supported_os_list:
+  - RedHat_6
+  - RedHat_7
+  - CentOS_6
+  - CentOS_7
+

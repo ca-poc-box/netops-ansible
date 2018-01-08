@@ -1,0 +1,21 @@
+---
+- name: Check for existing UIM Tunnel Hub install
+  stat:
+    path: '{{ installation_path }}'
+  register: uim-tunnel_stat
+
+- name: Copy distributed install host file
+  template:
+    src: uim-tunnel.host_inst.j2
+    dest: /uim-tunnel.host_inst
+  when: not uim-tunnel_stat.stat.exists
+
+- name: Install UIM Tunnel Hub install
+  command: '{{ distinst_installer_path }} -h /distinst.host_inst -p /distinst.pass -accept' ???????????????????????
+  when: not uim-tunnel_stat.stat.exists
+
+- name: Start the UIM Tunnel Hub install
+  command: '{{ installation_path }}/bin/startSS.pl' ?????????????????????????????
+  become: true
+  become_user: '{{ install_owner }}'
+ 

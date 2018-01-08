@@ -1,0 +1,2 @@
+---
+- include: '{{ ansible_os_family }}_{{ ansible_distribution_major_version }}.yml'

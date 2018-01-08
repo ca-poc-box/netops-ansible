@@ -1,0 +1,34 @@
+---
+- name: Install NFS packages
+  package:
+    name: '{{ item }}'
+    state: installed
+  with_items:
+    - nfs-utils
+
+- include_role:
+    name: firewall
+    private: yes
+  vars:
+    firewall_port_list:
+      - { destination_port: 2049, protocol: tcp }
+      - { destination_port: 2049, protocol: udp }
+
+- name: Create directory for NFS share
+  file:
+    path: /nfsshare
+    state: directory
+
+- name: Update /etc/exports to share the directory
+  lineinfile:
+    path: /etc/exports
+    line: /nfsshare {{ item }}(rw,sync,no_root_squash)
+  with_items: "{{ groups['da'] }}"
+  notify: restart nfs
+
+- name: Start NFS services
+  service:
+    name: nfs
+    state: started
+    enabled: true
+

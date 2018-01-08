@@ -1,0 +1,6 @@
+---
+- hosts: sdc
+  become: yes
+  roles:
+    - sdc
+

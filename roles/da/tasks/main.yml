@@ -1,0 +1,41 @@
+---
+- include_vars: firewall.yml
+
+- include_role:
+    name: firewall
+    private: yes
+
+- name: Check for existing DA install
+  stat:
+    path: '{{ installation_path }}'
+  register: dadaemon_stat
+
+- name: Copy hosts file
+  template:
+    src: hosts.file.j2
+    dest: /etc/hosts
+
+- name: Copy installer properties
+  template:
+    src: installer.response.j2
+    dest: /da.installer.properties
+  when: not dadaemon_stat.stat.exists
+
+- name: Copy DA installer
+  copy:
+    src: '{{ da_installer_path }}'
+    dest: /installDA.bin
+    mode: 0700
+    remote_src: '{{ da_installer_remote_src }}'
+  when: not dadaemon_stat.stat.exists
+
+- name: Install DA
+  command: /installDA.bin -i silent -f /da.installer.properties
+  when: not dadaemon_stat.stat.exists
+  register: da_install_status
+
+- name: Set fact to indicate whether or not the DA install was performed
+  set_fact:
+    da_install_performed:
+      "{ '{{ ansible_hostname }}': {{ da_install_status.changed }} }"
+

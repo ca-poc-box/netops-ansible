@@ -1,0 +1,129 @@
+---
+- include_role:
+    name: firewall
+    private: yes
+  vars:
+    firewall_port_list:
+      - { destination_port: 4803, protocol: udp }
+      - { destination_port: 4804, protocol: udp }
+      - { destination_port: 4805, protocol: udp }
+      - { destination_port: 4803, protocol: tcp }
+      - { destination_port: 4804, protocol: tcp }
+      - { destination_port: 4805, protocol: tcp }
+      - { destination_port: 5433, protocol: tcp }
+      - { destination_port: 5434, protocol: tcp }
+      - { destination_port: 5444, protocol: tcp }
+      - { destination_port: 5450, protocol: tcp }
+
+- name: Check for existing DR installation
+  stat:
+    path: /opt/vertica/bin/vertica
+  register: verticad_stat
+
+- name: Create /export directory
+  file:
+    path: /export
+    state: directory
+    mode: 0777
+
+- name: Create verticadba group
+  group:
+    name: verticadba
+  when: not verticad_stat.stat.exists
+
+- name: Create dradmin user
+  user:
+    name: dradmin
+    group: verticadba
+    home: /home/dradmin
+  when: not verticad_stat.stat.exists
+
+- name: Create vertica directories
+  file:
+    path: '{{ item }}'
+    state: directory
+    mode: 0755
+    owner: dradmin
+    group: verticadba
+  with_items:
+    - /opt
+    - /opt/data
+    - /opt/catalog
+  when: not verticad_stat.stat.exists
+
+- name: Generate SSH identities for DR hosts
+  command: ssh-keyscan 127.0.0.1 localhost {{ groups['dr'] | join(' ') }}
+  register: ssh_id
+
+- name: Update known_hosts with all DR hosts
+  blockinfile:
+    block: '{{ ssh_id.stdout }}'
+    dest: $HOME/.ssh/known_hosts
+    create: yes
+
+- name: Create SSH keys (if necessary)
+  shell: ssh-keygen -f id_rsa -t rsa -N ''
+  args:
+    chdir: $HOME/.ssh
+    creates: $HOME/.ssh/id_rsa
+
+- name: Get public SSH key of remote host
+  command: cat $HOME/.ssh/id_rsa.pub
+  register: public_ssh_key
+  run_once: yes
+  delegate_to: "{{ groups['dr'][0] }}"
+
+- name: Add SSH public key to authorized_keys
+  blockinfile:
+    block: "{{ public_ssh_key.stdout }}"
+    dest: $HOME/.ssh/authorized_keys
+    create: yes
+
+- include: '{{ ansible_os_family }}_{{ ansible_distribution_major_version }}_VerticaPackages.yml'
+  when: not verticad_stat.stat.exists
+
+- name: Copy hosts file
+  template:
+    src: hosts.file.j2
+    dest: /etc/hosts
+
+- name: Copy installer response file
+  template:
+    src: installer.response.j2
+    dest: /dr.response
+  when: not verticad_stat.stat.exists and inventory_hostname == groups['dr'][0]
+
+- name: Copy installer properties file
+  template:
+    src: drinstall.properties.j2
+    dest: /drinstall.properties
+  when: not verticad_stat.stat.exists and inventory_hostname == groups['dr'][0]
+
+- name: Copy DR installer
+  copy:
+    src: '{{ dr_installer_path }}'
+    dest: /installDR.bin
+    mode: 0700
+    remote_src: '{{ dr_installer_remote_src }}'
+  when: not verticad_stat.stat.exists and inventory_hostname == groups['dr'][0]
+
+- name: Run DR IA installer
+  command: /installDR.bin -i silent -f /dr.response
+  when: not verticad_stat.stat.exists and inventory_hostname == groups['dr'][0]
+
+- name: Update the dr_install.sh script (disable errors and prompts)
+  lineinfile:
+    path: /opt/CA/vertica/dr_install.sh
+    regexp: '(.*)--failure-threshold FAIL(.*)'
+    line: '\1--failure-threshold NONE --dba-user-password-disabled\2'
+    backrefs: yes
+  when: not verticad_stat.stat.exists and inventory_hostname == groups['dr'][0]
+
+- name: Run DR install script
+  command: ./dr_install.sh -p /drinstall.properties
+  args:
+    chdir: /opt/CA/vertica
+  run_once: yes
+  delegate_to: "{{ groups['dr'][0] }}"
+  when: not verticad_stat.stat.exists
+

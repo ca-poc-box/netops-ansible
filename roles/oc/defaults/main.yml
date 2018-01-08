@@ -1,0 +1,6 @@
+---
+installation_path: /usr/Spectrum
+install_owner: spectrum
+distinst_user: root
+distinst_pass: CAdemo123
+

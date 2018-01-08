@@ -1,0 +1,16 @@
+---
+- fail:
+    msg: "Inventory file must contain exactly 1 DA for standard deployemnts"
+  when: "'da' not in groups or groups['da'] | length != 1"
+  run_once: yes
+
+- fail:
+    msg: "Inventory file must contain at least 1 DR for standard deployments"
+  when: "'dr' not in groups or groups['dr'] | length < 1"
+  run_once: yes
+
+- fail:
+    msg: "Inventory file must contain exactly 1 CAPC for standard deployments"
+  when: "'capc' not in groups or groups['capc'] | length != 1"
+  run_once: yes
+

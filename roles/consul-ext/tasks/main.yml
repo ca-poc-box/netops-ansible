@@ -1,0 +1,25 @@
+---
+- name: Check for existing Consul Extension install
+  stat:
+    path: '{{ installation_path }}'
+  register: consul_ext_stat
+
+- name: Copy installer properties
+  template:
+    src: installer.response.j2
+    dest: /consul-ext.response
+  when: not consul_ext_stat.stat.exists
+
+- name: Copy Consul Extension installer
+  copy:
+    src: '{{ consulext_installer_path }}'
+    dest: /installConsulExt.bin
+    mode: 0700
+    remote_src: '{{ consulext_installer_remote_src }}'
+  when: not consul_ext_stat.stat.exists
+
+- name: Install Consul Extension
+  command: /installConsulExt.bin -i silent -f /consul-ext.response
+  when: not consul_ext_stat.stat.exists
+  ignore_errors: yes
+

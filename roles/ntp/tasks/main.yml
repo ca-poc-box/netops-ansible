@@ -1,0 +1,30 @@
+---
+- name: Install NTP daemon
+  yum:
+    name: ntp
+    state: installed
+  notify: Restart NTP
+
+- name: Remove default server lines from ntp.conf
+  replace:
+    dest: /etc/ntp.conf
+    regexp: '^server\s+.*$'
+  when: ntp_servers and ntp_servers|length > 0
+  notify: Restart NTP
+
+- name: Update ntp.conf to include the servers file
+  lineinfile:
+    dest: /etc/ntp.conf
+    line: 'includefile /etc/ntp.servers.conf'
+  when: ntp_servers and ntp_servers|length > 0
+  notify: Restart NTP
+
+- name: Create /etc/ntp.servers.conf file containing the specified time servers
+  template:
+    src: ntp.servers.conf.j2
+    dest: /etc/ntp.servers.conf
+    mode: 0600
+    backup: yes
+  when: ntp_servers and ntp_servers|length > 0
+  notify: Restart NTP
+

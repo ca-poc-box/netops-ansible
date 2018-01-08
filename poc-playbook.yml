@@ -1,0 +1,32 @@
+---
+# This playbook performs a fault-tolerant CAPM deployment
+- hosts: all
+  become: yes
+  roles:
+    - pre-flight
+    - common
+    - ntp
+
+- include: services/apm.yml
+
+- include: services/dr.yml
+
+- include: services/da.yml
+
+- include: services/capc.yml
+
+- include: services/dc.yml
+
+- include: services/ss.yml
+
+- include: services/oc.yml
+
+- include: services/vna.yml
+
+- hosts: all
+  become: yes
+  tags:
+    - post-install
+  roles:
+    - post-install
+

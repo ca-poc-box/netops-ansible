@@ -1,0 +1,8 @@
+---
+- name: Extra packages for CentOS
+  package:
+    name: '{{ item }}'
+    state: installed
+  with_items:
+    - epel-release
+    - bash-completion

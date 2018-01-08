@@ -1,0 +1,6 @@
+---
+- hosts: ss
+  become: yes
+  roles:
+    - ss
+

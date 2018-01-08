@@ -1,0 +1,6 @@
+---
+- hosts: vna
+  become: yes
+  roles:
+    - vna
+

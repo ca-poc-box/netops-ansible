@@ -1,0 +1,9 @@
+[rhel-cd]
+name=Red Hat Enterprise Linux $releasever - $basearch - CD
+{% if ansible_distribution_major_version == '6' %}
+baseurl=file:///net/gravity/RedHat/Media/RHE6U8x64
+{% elif ansible_distribution_major_version == '7' %}
+baseurl=file:///net/gravity/RedHat/Media/RHE7U3x64
+{% endif %}
+enabled=1
+gpgcheck=0

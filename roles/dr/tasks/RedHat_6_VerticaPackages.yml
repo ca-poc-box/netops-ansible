@@ -1,0 +1,11 @@
+---
+- name: Packages required for Vertica installation
+  package:
+    name: '{{ item }}'
+    state: installed
+  with_items:
+    - dialog
+    - mcelog
+    - pstack
+    - sysstat
+

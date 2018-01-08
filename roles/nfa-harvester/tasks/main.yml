@@ -1,0 +1,21 @@
+---
+- name: Check for existing NFA Harvester install
+  stat:
+    path: '{{ installation_path }}'
+  register: nfahv_stat
+
+- name: Copy distributed install host file
+  template:
+    src: nfa-harvester.host_inst.j2
+    dest: /harvester.properties
+  when: not nfahv_stat.stat.exists
+
+- name: Install NFA Harvester
+  command: '{{ nfa-harvester_installer_path }} -h /distinst.host_inst -p /distinst.pass -accept'????????????????
+  when: not nfahv_stat.stat.exists
+
+- name: Start the SpectroSERVER
+  command: '{{ installation_path }}/bin/harvester.pl'????????????
+  become: true
+  become_user: '{{ install_owner }}'
+ 

@@ -1,0 +1,60 @@
+---
+- include_role:
+    name: firewall
+    private: yes
+  vars:
+    firewall_port_list:
+      - { destination_port: 8080, protocol: tcp }
+      - { destination_port: 14001, protocol: tcp }
+
+- name: Install ksh
+  package:
+    name: ksh
+    state: present
+
+- name: Check for existing OC install
+  stat:
+    path: '{{ installation_path }}'
+  register: oc_stat
+ 
+- name: Check for existing SRAdmin install
+  stat:
+    path: /sw/SPECTRUM/SRAdmin
+  register: srad_stat
+
+- name: Copy hosts file
+  template:
+    src: hosts.file.j2
+    dest: /etc/hosts
+  when: not oc_stat.stat.exists
+
+- name: Extract Spectrum Installer
+  unarchive:
+    dest: /tmp
+    src: '{{ ssmajor_installer_path }}'
+  when: not oc_stat.stat.exists
+ 
+- name: Install SRAdmin
+  command: /tmp/sdic/linux/srainstall.bin -i silent
+  when: not srad_stat.stat.exists
+
+- name: Add spectrum user
+  user:
+    name: '{{ install_owner }}'
+
+- name: Copy distributed install host file
+  template:
+    src: distinst.host_inst.j2
+    dest: /distinst.host_inst
+  when: not oc_stat.stat.exists
+
+- name:  Copy distributed install password file
+  template:
+    src: distinst.pass.j2
+    dest: /distinst.pass
+  when: not oc_stat.stat.exists
+
+- name: Install OneClick
+  command: '/tmp/sdic/sdiclinux.exe -h /distinst.host_inst -p /distinst.pass -accept'
+  when: not oc_stat.stat.exists
+

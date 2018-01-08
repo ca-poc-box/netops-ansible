@@ -1,0 +1,6 @@
+---
+- hosts: dc
+  become: yes
+  roles:
+    - dc
+

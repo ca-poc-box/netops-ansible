@@ -1,0 +1,43 @@
+---
+- include_role:
+    name: firewall
+    private: yes
+  vars:
+    firewall_port_list:
+      - { destination_port: 1099, protocol: tcp }
+      - { destination_port: 5005, protocol: tcp }
+      - { destination_port: 8161, protocol: tcp }
+      - { destination_port: 8601, protocol: tcp }
+      - { destination_port: 8681, protocol: tcp }
+      - { destination_port: 11099, protocol: tcp }
+      - { destination_port: 61616, protocol: tcp }
+
+- name: Check for existing DC install
+  stat:
+    path: '{{ installation_path }}'
+  register: dcmd_stat
+
+- name: Copy hosts file
+  template:
+    src: hosts.file.j2
+    dest: /etc/hosts
+
+- name: Copy installer properties
+  template:
+    src: installer.response.j2
+    dest: /dc.installer.properties
+  when: not dcmd_stat.stat.exists
+
+- name: Download the DC installer from the DA
+  get_url:
+    url: http://{{ groups['daproxy'][0] if deployment_type is defined and deployment_type == 'fault_tolerant' else groups['da'][0] }}:8581/dcm/InstData/Linux/VM/install.bin
+    dest: /installDC.bin
+    mode: 0700
+  retries: 5
+  delay: 10
+  when: not dcmd_stat.stat.exists
+
+- name: Install DC
+  command: /installDC.bin -i silent -f /dc.installer.properties
+  when: not dcmd_stat.stat.exists
+

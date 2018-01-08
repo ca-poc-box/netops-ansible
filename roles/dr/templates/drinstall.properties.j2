@@ -1,0 +1,8 @@
+AllowVerticaInstallWarnings=true
+DbAdminLinuxUser=dradmin
+DbAdminLinuxUserHome=/home/dradmin
+DbDataDir=/opt/data
+DbCatalogDir=/opt/catalog
+DbHostNames={{ groups['dr'] | join(',') }}
+DbName=drdata
+DbPwd=drpass

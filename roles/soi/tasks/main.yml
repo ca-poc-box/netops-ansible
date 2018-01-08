@@ -1,0 +1,21 @@
+---
+- name: Check for existing SOI install
+  stat:
+    path: '{{ installation_path }}'
+  register: soi_stat
+
+- name: Copy distributed install host file
+  template:
+    src: soi.host_inst.j2
+    dest: /soi.host_inst
+  when: not soi_stat.stat.exists
+
+- name: Install SOI
+  command: '{{ distinst_installer_path }} -h /distinst.host_inst -p /distinst.pass -accept' ??????????????????????????????
+  when: not soi_stat.stat.exists
+
+- name: Start SOI
+  command: '{{ installation_path }}/bin/startSS.pl' ????????????????
+  become: true
+  become_user: '{{ install_owner }}'
+ 
