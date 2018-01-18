@@ -1,21 +1,83 @@
+# /etc/ansible/configurations/uim_install.yml
 ---
-- name: Check for existing UIM install
-  stat:
-    path: '{{ installation_path }}'
-  register: uim_stat
+- name: Install UIM
+  hosts: uim
+  become_method: runas
+  tasks:
+  - name: Check for existing UIM install
+    win_stat:
+      path: D:\UIM
+    register: uim_stat
 
-- name: Copy distributed install host file
-  template:
-    src: uim.host_inst.j2
-    dest: /uim.host_inst
-  when: not uim_stat.stat.exists
+  - name: Copy hosts file
+    win_copy: 
+     src: /etc/hosts
+     dest: C:\Windows\System32\drivers\etc\hosts
+     force: yes
+    when: not uim_stat.stat.exists
 
-- name: Install UIM Primary Hub / UMP
-  command: '{{ distinst_installer_path }} -h /distinst.host_inst -p /distinst.pass -accept' ?????????????????????
-  when: not ss_stat.stat.exists
+  - name: Copy installer response files for UIM and UMP
+    win_copy:
+     src: /etc/ansible/roles/uim/templates/
+     dest: D:\installers\uim\bits\
+    when: not uim_stat.stat.exists
+     
+  - name: Copy installer files
+    win_copy:
+     src: '{{ uim_installer_path }}'
+     dest: D:\installers\uim\iso\
+    when: not uim_stat.stat.exists
 
-- name: Start the UIM Primary Hub / UMP
-  command: '{{ installation_path }}/bin/startSS.pl'  ????????????????????????????
-  become: true
-  become_user: '{{ install_owner }}'
- 
+  - name: Mount ISO file
+    win_disk_image:
+     image_path: D:\installers\uim\iso\uim.iso
+     state: present
+    register: disk_image_out
+    when: not uim_stat.stat.exists
+
+  - name: Copy install files from ISO to disk
+    win_shell: copy-item -force '{{ disk_image_out.mount_path }}*.*' d:\Installers\uim\bits\
+    when: not uim_stat.stat.exists
+      
+  - name: Run UIM Installer
+    become: yes
+    become_user: administrator
+    win_package: 
+     path: 'D:\Installers\uim\bits\setupCAUIMServer.exe'
+     arguments: '-i silent'
+     product_id: UIM
+     creates_path: D:\UIM
+     state: present
+    when: not uim_stat.stat.exists
+     
+  - name: Run UMP Installer
+    become: yes
+    become_user: administrator
+    win_package:
+     path: 'D:\Installers\uim\bits\installUMP.exe'
+     arguments: '-i silent -f ump_installer.properties'
+     product_id: UMP
+     creates_path: D:\UIM\UMP
+     state: present
+    when: not uim_stat.stat.exists
+     
+  - name: Copy probes over
+    win_copy:
+     src: /root/netops-ansible/installers/uim/probes/
+     dest: d:\UIM\archive\
+    when: not uim_stat.stat.exists
+     
+  - name: Deploy PPM probe 
+    win_shell: 'pu.exe -u administrator -p CAdemo123 /CA_UIM/primary/UIM/automated_deployment_engine deploy_probe ppm "3.47" UIM "" "" deploy-ppm ""'
+    args:
+     executable: cmd
+     chdir: D:\UIM\bin
+    when: not uim_stat.stat.exists
+     
+  - name: Deploy CABI probe
+    win_shell: 'pu.exe -u administrator -p CAdemo123 /CA_UIM/primary/UIM/automated_deployment_engine deploy_probe cabi_external "" UIM "" "" deploy-cabi ""'
+    args:
+     executable: cmd
+     chdir: D:\UIM\bin
+    when: not uim_stat.stat.exists
+...

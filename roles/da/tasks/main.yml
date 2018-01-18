@@ -10,15 +10,20 @@
     path: '{{ installation_path }}'
   register: dadaemon_stat
 
-- name: Copy hosts file
-  template:
-    src: hosts.file.j2
-    dest: /etc/hosts
-
 - name: Copy installer properties
   template:
     src: installer.response.j2
     dest: /da.installer.properties
+  when: not dadaemon_stat.stat.exists
+
+- name: Copy hosts file
+  copy:
+    src: /etc/hosts
+    dest: /etc/hosts
+    force: yes
+    owner: root
+    group: root
+    mode: 0644
   when: not dadaemon_stat.stat.exists
 
 - name: Copy DA installer

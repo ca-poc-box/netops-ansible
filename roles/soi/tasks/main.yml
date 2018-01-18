@@ -1,21 +1,66 @@
+# /etc/ansible/configurations/soi_install.yml
 ---
-- name: Check for existing SOI install
-  stat:
-    path: '{{ installation_path }}'
-  register: soi_stat
+- name: Install SOI Playbook
+  hosts: soi
+  become_method: runas
+  tasks:
+  - name: Check for existing SOI install
+    win_stat:
+      path: D:\Program Files (x86)\CA\SOI\
+    register: soi_stat
 
-- name: Copy distributed install host file
-  template:
-    src: soi.host_inst.j2
-    dest: /soi.host_inst
-  when: not soi_stat.stat.exists
+  - name: Copy hosts file
+    win_copy: 
+     src: /etc/hosts
+     dest: C:\Windows\System32\drivers\etc\hosts
+     force: yes
+    when: not soi_stat.stat.exists
 
-- name: Install SOI
-  command: '{{ distinst_installer_path }} -h /distinst.host_inst -p /distinst.pass -accept' ??????????????????????????????
-  when: not soi_stat.stat.exists
+  - name: Copy installer SOI files
+    win_copy:
+     src: '{{ soi_installer_path }}'
+     dest: D:\installers\
+    when: not soi_stat.stat.exists
+    
+  - name: Unzip SOI installer
+    win_unzip:
+     src: d:\installers\SOI_Install.zip
+     dest: d:\installers\
+    when: not soi_stat.stat.exists
 
-- name: Start SOI
-  command: '{{ installation_path }}/bin/startSS.pl' ????????????????
-  become: true
-  become_user: '{{ install_owner }}'
- 
+  - name: Copy installer response files for SOI EEM
+    win_copy:
+     src: /root/netops-ansible/roles/soi/templates/soi_eem_installer.properties
+     dest: D:\installers\soi\EEM\soi_eem_installer.properties
+    when: not soi_stat.stat.exists
+     
+  - name: Copy installer response files for SOI
+    win_copy:
+     src: /root/netops-ansible/roles/soi/templates/soi_installer.properties
+     dest: D:\installers\soi\SOI\soi_installer.properties
+    when: not soi_stat.stat.exists
+     
+# EEM Install
+  - name: Install SOI EEM
+    become: yes
+    become_user: administrator
+    win_package:
+     path: d:\installers\soi\EEM\EEMServer_win64.exe
+     creates_path: C:\Program Files\CA\SC\EmbeddedEntitlementsManager\
+     product_id: SOI EEM
+     arguments: '-i silent -f soi_eem_installer.properties'
+     state: present
+    when: not soi_stat.stat.exists
+     
+# SOI Install
+  - name: Install SOI
+    become: yes
+    become_user: administrator
+    win_package:
+     path: d:\installers\soi\SOI\soi-installer.exe
+     creates_path: D:\Program Files (x86)\CA\SOI\
+     product_id: SOI
+     arguments: '-i silent -f soi_installer.properties'
+     state: present
+    when: not soi_stat.stat.exists
+...

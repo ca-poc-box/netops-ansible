@@ -1,0 +1,4 @@
+#~/etc/ansible/configurations/copy_hosts_file.yml
+---
+- import_playbook: /etc/ansible/configurations/copy_hosts_linux.yml
+- import_playbook: /etc/ansible/configurations/copy_hosts_windows.yml

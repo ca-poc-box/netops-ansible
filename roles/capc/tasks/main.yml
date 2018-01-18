@@ -15,15 +15,25 @@
     path: '{{ installation_path }}'
   register: capc_stat
 
-- name: Copy hosts file
-  template:
-    src: hosts.file.j2
-    dest: /etc/hosts
+#- name: Copy hosts file
+#  template:
+#    src: hosts.file.j2
+#    dest: /etc/hosts
 
 - name: Copy installer properties
   template:
     src: installer.response.j2
     dest: /capc.response
+  when: not capc_stat.stat.exists
+
+- name: Copy hosts file
+  copy:
+    src: /etc/hosts
+    dest: /etc/hosts
+    force: yes
+    owner: root
+    group: root
+    mode: 0644
   when: not capc_stat.stat.exists
 
 - name: Copy CAPC installer

@@ -1,0 +1,41 @@
+# /root/netops-ansible/roles/tasks/ada_install.yml
+---
+- name: Install ADA Playbook
+  hosts: ada
+  become_method: runas
+  tasks:  
+  - name: Check for existing ADA install
+    win_stat:
+      path: D:\CA
+    register: ada_stat
+
+  - name: Copy installer response files for ADA
+    win_copy:
+     src: /root/netops-ansible/roles/ada/templates/installer.response.j2
+     dest: D:\installers\ada\bits\ada.installer.properties
+    when: not ada_stat.stat.exists
+  
+  - name: Copy hosts file
+    win_copy: 
+     src: /etc/hosts
+     dest: C:\Windows\System32\drivers\etc\hosts
+     force: yes
+    when: not ada_stat.stat.exists
+
+  - name: Copy ADA installer
+    win_copy:
+     src: '{{ ada_installer_path }}' 
+     dest: D:\installers\ada\bits\ADASetup.exe
+    when: not ada_stat.stat.exists
+
+  - name: Install ADA Console
+    become: yes
+    become_user: administrator
+    win_package:
+     path: D:\installers\ada\bits\ADASetup.exe
+     creates_path: D:\CA
+     product_id: ADA Console
+     arguments: '-i silent -f ada.installer.properties'
+     state: present
+    when: not ada_stat.stat.exists
+...

@@ -22,12 +22,6 @@
     path: /sw/SPECTRUM/SRAdmin
   register: srad_stat
 
-- name: Copy hosts file
-  template:
-    src: hosts.file.j2
-    dest: /etc/hosts
-  when: not oc_stat.stat.exists
-
 - name: Extract Spectrum Installer
   unarchive:
     dest: /tmp
@@ -52,6 +46,16 @@
   template:
     src: distinst.pass.j2
     dest: /distinst.pass
+  when: not oc_stat.stat.exists
+
+- name: Copy hosts file
+  copy:
+    src: /etc/hosts
+    dest: /etc/hosts
+    force: yes
+    owner: root
+    group: root
+    mode: 0644
   when: not oc_stat.stat.exists
 
 - name: Install OneClick

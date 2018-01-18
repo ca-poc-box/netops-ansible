@@ -1,0 +1,14 @@
+#~/root/netops-ansible/poc-windows-playbook.yml
+---
+- hosts: all
+
+- include: roles/ada/tasks/main.yml
+
+- include: roles/cabi/tasks/main.yml
+
+- include: roles/nfa/tasks/main.yml
+
+- include: roles/soi/tasks/main.yml
+
+- include: roles/uim/tasks/main.yml
+

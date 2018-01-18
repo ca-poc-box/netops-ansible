@@ -1,5 +1,5 @@
 ---
-# This playbook performs a fault-tolerant CAPM deployment
+# This playbook performs a CAPM deployment
 - hosts: all
   become: yes
   roles:

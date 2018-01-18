@@ -1,29 +1,16 @@
 [linux]
-DXC
+APM
 CAPC
 DA
 DC
 DR
-APM
+DXC
 TIM
 SPECTRUM
 VNA
 
-[windows]
-CABI
-UIM
-NFA
-ADA
-SOI
-
-[ada]
-ADA
-
 [apm]
 APM
-
-[cabi]
-CABI
 
 [capc]
 CAPC
@@ -40,20 +27,11 @@ DC
 [dxc]
 DXC
 
-[nfa]
-NFA
-
-[soi]
-SOI
-
 [ss]
 SPECTRUM
 
 [oc]
 SPECTRUM
-
-[uim]
-UIM
 
 [vna]
 VNA

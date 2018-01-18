@@ -1,14 +1,47 @@
+# ~/roles/cabi/tasks/main.yml
 ---
-- name: Copy installer zip file
-  win_copy:
-   src: '{{ cabi_installer_path }}'
-   dest: c:\installers\cabi\
-- name: Unzip CABI installer
-  win_unzip:
-   src: c:\installers\cabi\CABI.zip
-   dest: c:\installers\cabi\bits
-   creates: c:\installers\cabi\bits
-- name: Copy installer response file
-  template:
-   src: CABusinessIntelligence.properties
-   dest: c:\installers\cabi\bits\CABusinessIntelligence.properties
+- name: Install CABI
+  hosts: CABI
+  become_method: runas
+  tasks:
+  - name: Check for existing CABI install
+    win_stat:
+      path: D:\Program Files\CA\SC\CA Business Intelligence
+    register: cabi_stat
+
+  - name: Copy hosts file
+    win_copy: 
+     src: /etc/hosts
+     dest: C:\Windows\System32\drivers\etc\hosts
+     force: yes
+    when: not cabi_stat.stat.exists
+
+  - name: Copy installer zip file
+    win_copy:
+     src: '{{ cabi_installer_path }}'
+     dest: d:\installers\cabi\cabi_setup.zip
+    when: not cabi_stat.stat.exists
+
+  - name: Unzip CABI installer
+    win_unzip:
+     src: d:\installers\cabi\cabi_setup.zip
+     dest: d:\installers\cabi\bits
+    when: not cabi_stat.stat.exists
+
+  - name: Copy installer response file
+    win_copy:
+     src: /root/netops-ansible/roles/cabi/templates/installer.response.j2
+     dest: d:\installers\cabi\bits\CABusinessIntelligence.properties
+     force: yes      
+    when: not cabi_stat.stat.exists
+     
+  - name: Install CABI
+    become: yes
+    become_user: administrator
+    win_shell: 'setup.bat -f %cd%\CABusinessIntelligence.properties -i silent'
+    args:
+     executable: cmd
+     chdir: D:\installers\cabi\bits\
+     creates: D:\Program Files\CA\SC\CA Business Intelligence 
+    when: not cabi_stat.stat.exists
+...   
