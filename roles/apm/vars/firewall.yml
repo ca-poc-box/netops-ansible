@@ -2,5 +2,6 @@ firewall_port_list:
   - { destination_port: 5001, protocol: tcp }
   - { destination_port: 8080, protocol: tcp }
   - { destination_port: 8081, protocol: tcp }
+  - { destination_port: 8443, protocol: tcp }
   - { destination_port: 5432, protocol: tcp }
 

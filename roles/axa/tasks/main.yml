@@ -1,0 +1,34 @@
+---
+- include_vars: firewall.yml
+
+- include_role:
+    name: firewall
+    private: yes
+
+- name: Check for existing AXA install
+  stat:
+    path: '{{ installation_path }}'
+  register: axa_stat
+
+- name: Copy hosts file
+  copy:
+    src: /etc/hosts
+    dest: /etc/hosts
+    force: yes
+    owner: root
+    group: root
+    mode: 0644
+  when: not axa_stat.stat.exists
+
+- name: Copy axa installer
+  copy:
+    src: '{{ axa_installer_path }}'
+    dest: /root/
+    mode: 0700
+    remote_src: '{{ axa_installer_remote_src }}'
+  when: not axa_stat.stat.exists
+
+- name: Set fact to indicate whether or not the axa install was performed
+  set_fact:
+    axa_install_performed:
+      "{ '{{ ansible_hostname }}': {{ axa_install_status.changed }} }"

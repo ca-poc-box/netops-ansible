@@ -1,0 +1,13 @@
+#~/roles/common/tasks/copy_hosts_linux.yml
+---
+- name: Copy hosts file to Linux Servers
+  hosts: all
+  tasks:
+  - name: Copy hosts file 
+    copy: 
+     src: /etc/hosts
+     dest: /etc/hosts
+     force: yes
+     owner: root
+     group: root
+     mode: 0644

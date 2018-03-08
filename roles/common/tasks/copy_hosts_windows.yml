@@ -1,0 +1,9 @@
+#~/roles/common/tasks/copy_hosts_windows.yml
+- name: Copy hosts file to Windows Servers
+  hosts: all
+  tasks:
+  - name: Copy hosts file
+    win_copy: 
+     src: /etc/hosts
+     dest: c:\Windows\System32\drivers\etc\hosts
+     force: yes

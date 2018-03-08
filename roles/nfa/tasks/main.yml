@@ -1,69 +1,79 @@
----  WILL BE WINDOWS ---
+# /etc/ansible/configurations/nfa_install.yml
+---
+- name: Install NFA Playbook
+  hosts: nfa
+  become_method: runas
+  tasks:
+  - name: Check for existing NFA install
+    win_stat:
+      path: D:\CA\NFA 
+    register: nfa_stat
 
+  - name: Copy hosts file
+    win_copy: 
+     src: /etc/hosts
+     dest: C:\Windows\System32\drivers\etc\hosts
+     force: yes
+    when: not nfa_stat.stat.exists
 
+  - name: Copy installer response files for NFA
+    win_copy:
+     src: /root/netops-ansible/roles/nfa/templates/
+     dest: D:\installers\nfa\bits\
+    when: not nfa_stat.stat.exists
 
+  - name: Copy NFA AD installer files
+    win_copy:
+     src: '{{ nfaad_installer_path }}'
+     dest: D:\installers\nfa\bits\ADSetup.exe
+    when: not nfa_stat.stat.exists
 
+  - name: Copy NFA Harvester installer files
+    win_copy:
+     src: '{{ nfah_installer_path }}'
+     dest: D:\installers\nfa\bits\NFHarvesterSetup.exe
+    when: not nfa_stat.stat.exists
 
+  - name: Copy NFA Console installer files
+    win_copy:
+     src: '{{ nfac_installer_path }}'
+     dest: D:\installers\nfa\bits\RAConsoleSetup.exe
+    when: not nfa_stat.stat.exists
 
-- include_role:
-    name: firewall
-    private: yes
-  vars:
-    firewall_port_list:
-      - { destination_port: 6844, protocol: tcp }
-      - { destination_port: 48879, protocol: tcp }
-      - { destination_port: 56063, protocol: tcp }
-      - { destination_port: 14002, protocol: tcp }
-      - { destination_port: 14003, protocol: tcp }
-      - { destination_port: 14004, protocol: tcp }
-      - { destination_port: 14006, protocol: tcp }
-      - { destination_port: 31415, protocol: tcp }
+  - name: Install NFA Harvester
+    become: yes
+    become_user: administrator
+    win_package:
+     path: d:\installers\nfa\bits\NFHarvesterSetup.exe
+     creates_path: D:\CA\NFA
+     product_id: NFA Harvester
+     arguments: '-i silent -f NFHarvester_installer.properties'
+     state: present
+    when: not nfa_stat.stat.exists
+     
+  - name: Install NFA Console
+    become: yes
+    become_user: administrator
+    win_package:
+     path: d:\installers\nfa\bits\RAConsoleSetup.exe
+     product_id: NFA Console
+     arguments: '-i silent -f RAConsole_installer.properties'
+     state: present
+    when: not nfa_stat.stat.exists
+     
+  - name: Wait on Reboot
+    wait_for: timeout=90
+    delegate_to: localhost
+    when: not nfa_stat.stat.exists
+     
+  - name: Install NFA Anomaly Detector
+    become: yes
+    become_user: administrator
+    win_package:
+     path: d:\installers\nfa\bits\ADSetup.exe
+     product_id: NFA Anomaly Detector
+     arguments: '-i silent -f AD_installer.properties'
+     state: present
+    when: not nfa_stat.stat.exists
 
-- name: Install ksh
-  package:
-    name: ksh
-    state: present
-
-- name: Add spectrum user
-  user:
-    name: '{{ install_owner }}'
-
-- name: Check for existing SRAdmin install
-  stat:
-    path: /sw/SPECTRUM/SRAdmin
-  register: srad_stat
-
-- name: Install SRAdmin
-  command: '{{ srad_installer_path }} -i silent'
-  when: not srad_stat.stat.exists
-
-- name: Check for existing SS install
-  stat:
-    path: '{{ installation_path }}'
-  register: ss_stat
-
-- name: Copy distributed install host file
-  template:
-    src: distinst.host_inst.j2
-    dest: /distinst.host_inst
-  when: not ss_stat.stat.exists
-
-- name:  Copy distributed install password file
-  template:
-    src: distinst.pass.j2
-    dest: /distinst.pass
-  when: not ss_stat.stat.exists
-
-- name: Install SpectroSERVER
-  command: '{{ distinst_installer_path }} -h /distinst.host_inst -p /distinst.pass -accept'
-  when: not ss_stat.stat.exists
-
-- name: Add OneClick to the .hostrc
-  shell: echo "" >> {{ installation_path }}/.hostrc ; echo {{ groups['oc'][0] }} >> {{ installation_path }}/.hostrc
-  when: not ss_stat.stat.exists
-
-- name: Start the SpectroSERVER
-  command: '{{ installation_path }}/bin/startSS.pl'
-  become: true
-  become_user: '{{ install_owner }}'
- 
+...

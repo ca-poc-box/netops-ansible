@@ -17,20 +17,25 @@
     path: '{{ installation_path }}'
   register: dcmd_stat
 
-- name: Copy hosts file
-  template:
-    src: hosts.file.j2
-    dest: /etc/hosts
-
 - name: Copy installer properties
   template:
     src: installer.response.j2
     dest: /dc.installer.properties
   when: not dcmd_stat.stat.exists
 
+- name: Copy hosts file
+  copy:
+    src: /etc/hosts
+    dest: /etc/hosts
+    force: yes
+    owner: root
+    group: root
+    mode: 0644
+  when: not dcmd_stat.stat.exists
+
 - name: Download the DC installer from the DA
   get_url:
-    url: http://{{ groups['daproxy'][0] if deployment_type is defined and deployment_type == 'fault_tolerant' else groups['da'][0] }}:8581/dcm/InstData/Linux/VM/install.bin
+    url: http://{{ groups['da'][0] }}:8581/dcm/InstData/Linux/VM/install.bin
     dest: /installDC.bin
     mode: 0700
   retries: 5

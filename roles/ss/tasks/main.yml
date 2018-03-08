@@ -12,10 +12,187 @@
       - { destination_port: 14004, protocol: tcp }
       - { destination_port: 14006, protocol: tcp }
       - { destination_port: 31415, protocol: tcp }
+      - { destination_port: 46517, protocol: tcp }
+      - { destination_port: 47870, protocol: tcp }
+      - { destination_port: 51966, protocol: tcp }
+      - { destination_port: 56063, protocol: tcp }
+      - { destination_port: 61904, protocol: tcp }
+      - { destination_port: 64222, protocol: tcp }
+      - { destination_port: 65259, protocol: tcp }
 
 - name: Install ksh
   package:
     name: ksh
+    state: present
+    
+- name: Install libXm.so.4
+  package: 
+    name: libXm.so.4
+    state: present
+
+- name: Install elfutils-libelf
+  package: 
+    name: elfutils-libelf
+    state: present
+
+- name: Install libaio
+  package: 
+    name: libaio
+    state: present
+
+- name: Install ncurses
+  package: 
+    name: ncurses
+    state: present
+    
+- name: Install ncurses-libs
+  package: 
+    name: ncurses-libs
+    state: present
+    
+- name: Install xterm
+  package: 
+    name: xterm
+    state: present
+    
+- name: Install xorg-x11-fonts-misc
+  package: 
+    name: xorg-x11-fonts-misc
+    state: present
+
+- name: Install PackageKit-gtk3-module
+  package: 
+    name: PackageKit-gtk3-module
+    state: present
+
+- name: Install libcanberra-gtk2
+  package: 
+    name: libcanberra-gtk2
+    state: present
+
+- name: Install lmotif
+  package: 
+    name: motif
+    state: present
+
+- name: Install glibc
+  package: 
+    name: glibc
+    state: present
+    
+- name: Install nss-softokn-freeb
+  package: 
+    name: nss-softokn-freebl
+    state: present
+
+- name: Install libICE
+  package: 
+    name: libICE
+    state: present
+
+- name: Install libSM
+  package: 
+    name: libSM
+    state: present
+
+- name: Install libX11
+  package: 
+    name: libX11
+    state: present
+
+- name: Install libXext
+  package: 
+    name: libXext
+    state: present
+
+- name: Install libXft
+  package: 
+    name: libXft
+    state: present
+
+- name: Install libXmu
+  package: 
+    name: libXmu
+    state: present
+
+- name: Install libXp
+  package: 
+    name: libXp
+    state: present
+
+- name: Install libXrender
+  package: 
+    name: libXrender
+    state: present
+
+- name: Install libXt
+  package: 
+    name: libXt
+    state: present
+
+- name: Install fontconfig
+  package: 
+    name: fontconfig
+    state: present
+
+- name: Install freetype
+  package: 
+    name: freetype
+    state: present
+
+- name: Install libjpeg-turbo
+  package: 
+    name: libjpeg-turbo
+    state: present
+
+- name: Install libpng
+  package: 
+    name: libpng
+    state: present
+
+- name: Install libuuid
+  package: 
+    name: libuuid
+    state: present
+
+- name: Install libxcb
+  package: 
+    name: libxcb
+    state: present
+
+- name: Install libXau
+  package: 
+    name: libXau
+    state: present
+
+- name: Install expat
+  package: 
+    name: expat
+    state: present
+
+- name: Install zlib
+  package: 
+    name: zlib
+    state: present
+
+- name: Install libstdc++
+  package: 
+    name: libstdc++
+    state: present
+ 
+- name: Install libgcc
+  package: 
+    name: libgcc
+    state: present
+ 
+- name: Install libXi
+  package: 
+    name: libXi
+    state: present
+ 
+- name: Install libXtst
+  package: 
+    name: libXtst
     state: present
 
 - name: Add spectrum user
@@ -31,19 +208,21 @@
   stat:
     path: '{{ installation_path }}'
   register: ss_stat
- 
-- name: Copy hosts file
-  template:
-    src: hosts.file.j2
-    dest: /etc/hosts
-  when: not ss_stat.stat.exists
 
 - name: Extract Spectrum Installer
   unarchive:
     dest: /tmp
     src: '{{ ssmajor_installer_path }}'
   when: not ss_stat.stat.exists
- 
+
+- name: Copy Spectrum-Minor Installer
+  copy:
+    src: '{{ ssminor_installer_path }}'
+    dest: /tmp
+    force: yes
+    mode: 0777
+  when: not ss_stat.stat.exists  
+
 - name: Install SRAdmin
   command: /tmp/sdic/linux/srainstall.bin -i silent
   when: not srad_stat.stat.exists
@@ -60,6 +239,16 @@
     dest: /distinst.pass
   when: not ss_stat.stat.exists
 
+- name: Copy hosts file
+  copy:
+    src: /etc/hosts
+    dest: /etc/hosts
+    force: yes
+    owner: root
+    group: root
+    mode: 0644
+  when: not ss_stat.stat.exists
+
 - name: Install SpectroSERVER
   command: /tmp/sdic/sdiclinux.exe -h /distinst.host_inst -p /distinst.pass -accept
   when: not ss_stat.stat.exists
@@ -68,6 +257,36 @@
   shell: echo "" >> {{ installation_path }}/.hostrc ; echo + >> {{ installation_path }}/.hostrc
   when: not ss_stat.stat.exists
 
+- name: Extract the patch contents
+  command: /tmp/SPECTRUM-MINOR.txe x
+  args:
+   chdir: /
+   creates: /10.02.03.00/setuplin.exe
+  ignore_errors: yes
+
+- name: Copy distributed install host file
+  template:
+    src: distinst.host_inst_up.j2
+    dest: /distinst.host_inst_up
+
+# Need to do a forced upgrade from 10.2.2 to 10.2.3 because 10.2.3 is not yet released
+- name: Update distributed install configuration for forced upgrade
+  lineinfile:
+    path: /distinst.host_inst_up
+    line: same=yes
+  when: force_upgrade | default('no')
+
+- name: Update distributed install configuration with patch vcd path
+  lineinfile:
+    path: /distinst.host_inst_up
+    line: vcd_path=/10.02.03.00
+    regexp: '^vcd_path=.*'
+
+- name: Upgrade the SpectroSERVER
+  command: '/10.02.03.00/sdic/sdiclinux.exe -h /distinst.host_inst_up -p /distinst.pass -accept'
+  async: 1800 # wait a max of 30 minutes for the task to complete
+  poll: 10 # poll the job every 10 seconds
+  
 - name: Start the SpectroSERVER
   command: '{{ installation_path }}/bin/startSS.pl'
   become: true

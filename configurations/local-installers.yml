@@ -1,14 +1,36 @@
+# local-installers.yml
+---
 # NTP Settings
 ntp_servers:
 #  - <your NTP server goes here>
 
+# ADA
+ada_installer_path: '{{ inventory_dir }}/installers/ada/ADASetup.exe'
+ada_installer_remote_src: no
+
 # APM
-apm_installer_path: '{{ inventory_dir }}/installers/apm/installIntroscope.bin
-apm_installer_remote_src: no 
+apm_installer_path: '{{ inventory_dir }}/installers/apm/installIntroscope.bin'
+apm_installer_remote_src: no
+
+# APM Agents
+apm_agents_path: '{{ inventory_dir }}/installers/apm/agents/'
+apm_agents_remote_src: no
+
+# CABI
+cabi_installer_path: '{{ inventory_dir }}/installers/cabi/cabi_setup.zip'
+cabi_installer_remote_src: no
 
 # CAPC
 capc_installer_path: '{{ inventory_dir }}/installers/pc/CAPerfCenterSetup.bin'
 capc_installer_remote_src: no
+
+# Consul
+consul_installer_path: '{{ inventory_dir }}/installers/capm/installConsul.bin'
+consul_installer_remote_src: no
+
+# Consul Extension
+consulext_installer_path: '{{ inventory_dir }}/installers/capm/installConsulExt.bin'
+consulext_installer_remote_src: no
 
 # DA
 da_installer_path: '{{ inventory_dir }}/installers/da/installDA.bin'
@@ -22,30 +44,39 @@ dr_installer_remote_src: no
 daproxy_installer_path: '{{ inventory_dir }}/installers/capm/installDAProxy.bin'
 daproxy_installer_remote_src: no
 
-# Consul
-consul_installer_path: '{{ inventory_dir }}/installers/capm/installConsul.bin'
-consul_installer_remote_src: no
+# NFA Anomaly Detector
+nfaad_installer_path: '{{ inventory_dir }}/installers/nfa/ADSetup.exe'
+nfaad_installer_remote_src: no
 
-# Consul Extension
-consulext_installer_path: '{{ inventory_dir }}/installers/capm/installConsulExt.bin'
-consulext_installer_remote_src: no
+# NFA Harvester
+nfah_installer_path: '{{ inventory_dir }}/installers/nfa/NFHarvesterSetup.exe'
+nfah_installer_remote_src: no
 
-# VNA
-vna_installer_path: '{{ inventory_dir }}/installers/capm/installVNA.txe'
-vna_installer_remote_src: no
+# NFA Console
+nfac_installer_path: '{{ inventory_dir }}/installers/nfa/RAConsoleSetup.exe'
+nfac_installer_remote_src: no
 
-#SPECTRUM-MAJOR
-ssmajor_installer_path: '{{ inventory_dir }}/installers/spectrum/SPECTRUM-MAJOR.tar.gz'
-ssmajor_installer_remote_src: no
-
-#SPECTRUM-MINOR
-ssminor_installer_path: '{{ inventory_dir }}/installers/spectrum/SPECTRUM-MINOR.txe'
-ssminor_installer_remote_src: no
-
-#SDC
+# SDC
 sdc_installer_path: '{{ inventory_dir }}/installers/spectrum/sdmc/linux/install.bin'
 sdc_installer_remote_src: no
 
-#CABI
-cabi_installer_path: '{{ inventory_dir }}/installers/cabi/CABI.zip'
-sdc_installer_remote_src: no
+# SOI
+soi_installer_path: '{{ inventory_dir }}/installers/soi/SOI_Install.zip'
+soi_installer_remote_src: no
+
+# SPECTRUM-MAJOR
+ssmajor_installer_path: '{{ inventory_dir }}/installers/spectrum/SPECTRUM-MAJOR.tar.gz'
+ssmajor_installer_remote_src: no
+
+# SPECTRUM-MINOR
+ssminor_installer_path: '{{ inventory_dir }}/installers/spectrum/SPECTRUM-MINOR.txe'
+ssminor_installer_remote_src: no
+
+# UIM 
+uim_installer_path: '{{ inventory_dir }}/installers/uim/uim.iso'
+uim_installer_remote_src: no
+
+# VNA
+vna_installer_path: '{{ inventory_dir }}/installers/vna/installVNA.txe'
+vna_installer_remote_src: no
+

@@ -28,6 +28,16 @@
     path: /installVNA.bin
   register: installer_stat
 
+- name: Copy hosts file
+  copy:
+    src: /etc/hosts
+    dest: /etc/hosts
+    force: yes
+    owner: root
+    group: root
+    mode: 0644
+  when: not vna_stat.stat.exists
+
 - name: Copy VNA installer
   copy:
     src: '{{ vna_installer_path }}'
