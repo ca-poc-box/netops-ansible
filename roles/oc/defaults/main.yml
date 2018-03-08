@@ -1,5 +1,5 @@
 ---
-installation_path: /usr/Spectrum
+installation_path: /opt/Spectrum
 install_owner: spectrum
 distinst_user: root
 distinst_pass: CAdemo123

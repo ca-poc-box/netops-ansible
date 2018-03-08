@@ -1,0 +1,6 @@
+firewall_port_list:
+  - { destination_port: 8080, protocol: tcp }
+  - { destination_port: 8081, protocol: tcp }
+  - { destination_port: 9080, protocol: tcp }
+
+

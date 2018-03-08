@@ -18,7 +18,7 @@
 
   - name: Copy installer response files for UIM and UMP
     win_copy:
-     src: /etc/ansible/roles/uim/templates/
+     src: /root/netops-ansible/roles/uim/templates/
      dest: D:\installers\uim\bits\
     when: not uim_stat.stat.exists
      
