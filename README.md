@@ -3,12 +3,18 @@ Ansible deployment automation for NetOps products (CAPM, ADA, NFA, SOI, Spectrum
 Latest doc:
 https://cawiki.ca.com/display/eastpresales/POC+Appliance+Details 
 
+
 Deployment setup:
 Ansible server reqs: CentOS 7.4, 1 vcpu and 4 GB RAM and 30 GB Storage
 Install Ansible:
 <br><br>
 yum -y install ansible
 <br>
+Clone the Ansible script from GitHub:
+<br><br>
+git clone https://github.com/ca-poc-box/netops-ansible.git
+<br>
+
 Update the poc-linux-inventory.yml and poc-windows-inventory.yml files with appropriate host names under each role
 Update the /etc/hosts file on the ansible server
 
