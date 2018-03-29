@@ -20,7 +20,7 @@ Update the /etc/hosts file on the ansible server
 
 Configure target VMs for Ansible:
 Windows Servers: 
-Need to setup to allow Basic Auth. Run the following from powershell:
+Need to setup to allow Basic Auth. Run the following from command prompt:
 <br><br>
 winrm set winrm/config/client/auth @{Basic="true"} 
 winrm set winrm/config/service/auth @{Basic="true"} 
